@@ -1,0 +1,104 @@
+{
+    "semanticCommits": "enabled",
+    "dependencyDashboard": true,
+    "dependencyDashboardTitle": "Renovate Dashboard",
+    "suppressNotifications": [
+        "prIgnoreNotification"
+    ],
+    "rebaseWhen": "conflicted",
+    "labels": [
+        "renovate"
+    ],
+    "ignoreDeps": [
+        "ghcr.io/fluxcd/helm-controller",
+        "ghcr.io/fluxcd/image-automation-controller",
+        "ghcr.io/fluxcd/image-reflector-controller",
+        "ghcr.io/fluxcd/kustomize-controller",
+        "ghcr.io/fluxcd/notification-controller",
+        "ghcr.io/fluxcd/source-controller",
+        "fluxcd/flux2"
+    ],
+    "helm-values": {
+        "fileMatch": [
+            "infrastructure/.+/release\\.yaml$",
+            "monitoring/.+/release\\.yaml$",
+            "apps/.+/release\\.yaml$"
+        ]
+    },
+    "regexManagers": [
+        {
+            "fileMatch": [
+                "apps/.+\\.yaml$",
+                "clusters/.+\\.yaml$",
+                "infrastructure/.+\\.yaml$",
+                "monitoring/.+\\.yaml$",
+                "tenants/.+\\.yaml$"
+            ],
+            "matchStrings": [
+                "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*)\n *version: (?<currentValue>.*)"
+            ],
+            "datasourceTemplate": "helm"
+        }
+    ],
+    "packageRules": [
+        {
+            "matchDatasources": [
+                "helm"
+            ],
+            "separateMinorPatch": true,
+            "ignoreDeprecated": true
+        },
+        {
+            "matchDatasources": [
+                "docker"
+            ],
+            "enabled": true,
+            "commitMessageTopic": "container image {{depName}}",
+            "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
+            "matchUpdateTypes": [
+                "major",
+                "minor",
+                "patch"
+            ]
+        },
+        {
+            "matchDatasources": [
+                "helm"
+            ],
+            "additionalBranchPrefix": "{{baseDir}}-",
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "addLabels": [
+                "helm",
+                "major"
+            ]
+        },
+        {
+            "matchDatasources": [
+                "helm"
+            ],
+            "additionalBranchPrefix": "{{baseDir}}-",
+            "matchUpdateTypes": [
+                "minor"
+            ],
+            "addLabels": [
+                "helm",
+                "minor"
+            ]
+        },
+        {
+            "matchDatasources": [
+                "helm"
+            ],
+            "additionalBranchPrefix": "{{baseDir}}-",
+            "matchUpdateTypes": [
+                "patch"
+            ],
+            "addLabels": [
+                "helm",
+                "patch"
+            ]
+        }
+    ]
+}
